@@ -42,10 +42,15 @@
         if(SelectedDay.Events == null)
             SelectedDay.Events = new List<CalendarEvent>();
 
-        SelectedDay.Events.Add(model); 
+        SelectedDay.Events.Add(new CalendarEvent
+        {
+            Subject = model.Subject,
+            StartDate = model.StartDate,
+            EndDate = model.EndDate
+        }); 
         
-        Console.WriteLine($"Total Events in Day {SelectedDay.Events.Count} | {model.Subject} | {model.StartDate} | {model.EndDate}");
-        model.Subject = string.Empty;
+        //  Console.WriteLine($"Total Events in Day {SelectedDay.Events.Count} | {model.Subject} | {model.StartDate} | {model.EndDate}");
+        model = new CalendarEvent();
 
         //push events to the Graph APi SDK
         
