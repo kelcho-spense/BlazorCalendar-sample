@@ -24,7 +24,21 @@
                     @if(!day.IsEmpty)
                     {
                         <div class="day shadow-effect @currentDayClass @selectedDayClass" @onclick="() => selectedDay = day">
-                            <h3 class="ms-fontSize-24 ms-fontWeight-regular">@day.DayNumber</h3>                            
+                            <h3 class="ms-fontSize-24 ms-fontWeight-regular">@day.DayNumber</h3> 
+                            @if(day.Events != null && day.Events.Count != 0)
+                            {
+                                var firstEvent = day.Events.FirstOrDefault();
+                                <div class="day-event @firstEvent.Color">
+                                    @if(firstEvent.Subject.Length > 25)
+                                    {
+                                        @firstEvent.Subject.Substring(0, 25)<text>...</text>
+                                    }
+                                    else
+                                    {
+                                         @firstEvent.Subject
+                                    }
+                                </div>
+                            }                           
                         </div>
                     }
                 </DayTemplate>
@@ -35,7 +49,8 @@
         <!-- Day Menu -->
         <div class="col-sm-12 col-md-12 col-lg-3">
             <!-- Add Event -->
-            <AddEvent SelectedDay="selectedDay" />
+            <AddEvent SelectedDay="@selectedDay" />
+            <EventsList SelectedDay="@selectedDay" />
         </div>
     </div>
 

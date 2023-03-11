@@ -6,6 +6,10 @@ namespace BlazorSample.Models
     public class CalendarEvent
     {
 
+        public CalendarEvent()
+        {
+            Color = Helpers.RandomColorHelper.GetRandomColorClass();
+        }
 
         public string Subject { get; set; }
 
