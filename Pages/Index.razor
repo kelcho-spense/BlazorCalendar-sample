@@ -19,11 +19,11 @@
                 <DayTemplate Context="day">
                     @{
                         string currentDayClass = day.Date == DateTime.Now.Date ? "current-day" : "";
-                        @* string selectedDayClass = day == selectedDay ? "selected-day" : ""; *@
+                        string selectedDayClass = day == selectedDay ? "selected-day" : "";
                     }
                     @if(!day.IsEmpty)
                     {
-                        <div class="day shadow-effect @currentDayClass">
+                        <div class="day shadow-effect @currentDayClass @selectedDayClass" @onclick="() => selectedDay = day">
                             <h3 class="ms-fontSize-24 ms-fontWeight-regular">@day.DayNumber</h3>                            
                         </div>
                     }
@@ -35,46 +35,15 @@
         <!-- Day Menu -->
         <div class="col-sm-12 col-md-12 col-lg-3">
             <!-- Add Event -->
-            <div class="ms-depth-16 card">
-                <div class="calendar-toolbar">
-                    <button class="toolbar-button"><i class="ms-Icon ms-Icon--AddEvent"></i></button>
-                </div>
-
-                <div class="card-content">
-                    <input type="text" class="fluent-input" placeholder="Event Subject">
-                    <input type="time" class="fluent-input" placeholder="Event Subject">
-                    <input type="time" class="fluent-input" placeholder="Event Subject">
-                </div>
-            </div>
-
-            <!-- Day Events List -->
-            <div class="ms-depth-16 card">
-                <div class="card-content">
-                    <h3 class="ms-fontSize-22 ms-fontWeight-regular">Tuesday, 22 May 2020</h3>
-
-                    <div class="event shadow-effect magenta">
-                        <h3 class="ms-fontSize-14 ms-fontWeight-regular">6:00 PM to 8:00 PM</h3>
-                        <p class="ms-fontSize-11 ms-fontWeight-regular">Lorem ipsum, dolor sit amet consectetur adipisicing.</p>
-                    </div>
-
-                    <div class="event shadow-effect yellow">
-                        <h3 class="ms-fontSize-14 ms-fontWeight-regular">6:00 PM to 8:00 PM</h3>
-                        <p class="ms-fontSize-11 ms-fontWeight-regular">Lorem ipsum, dolor sit amet consectetur adipisicing.</p>
-                    </div>
-
-                    <div class="event shadow-effect red-orange">
-                        <h3 class="ms-fontSize-14 ms-fontWeight-regular">6:00 PM to 8:00 PM</h3>
-                        <p class="ms-fontSize-11 ms-fontWeight-regular">Lorem ipsum, dolor sit amet consectetur adipisicing.</p>
-                    </div>
-
-                    <div class="event shadow-effect yellow-green">
-                        <h3 class="ms-fontSize-14 ms-fontWeight-regular">6:00 PM to 8:00 PM</h3>
-                        <p class="ms-fontSize-11 ms-fontWeight-regular">Lorem ipsum, dolor sit amet consectetur adipisicing.</p>
-                    </div>
-                </div>
-            </div>
+            <AddEvent SelectedDay="selectedDay" />
         </div>
     </div>
 
-
+@code 
+{
+    private CalendarDay selectedDay = new  CalendarDay
+    {
+        Date = DateTime.Now
+    };
+}
 
