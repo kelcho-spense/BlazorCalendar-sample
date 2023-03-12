@@ -53,8 +53,15 @@
         model = new CalendarEvent();
 
         //push events to the Graph APi SDK
+
+        OnEventAdded.Invoke();
+        
+
+
         
     }
+
+    public static event Action OnEventAdded = () => {  };
 
     
 

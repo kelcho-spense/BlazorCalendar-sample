@@ -60,5 +60,13 @@
     {
         Date = DateTime.Now
     };
+     
+     protected override void OnInitialized()
+    {
+        AddEvent.OnEventAdded += () => 
+        {
+            StateHasChanged();
+        };
+    }
 }
 

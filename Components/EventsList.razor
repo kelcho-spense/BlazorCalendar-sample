@@ -27,5 +27,12 @@
     [Parameter]
     public CalendarDay SelectedDay {get; set;}
 
+    protected override void OnInitialized()
+    {
+        AddEvent.OnEventAdded += () => 
+        {
+            StateHasChanged();
+        };
+    }
    
 }
