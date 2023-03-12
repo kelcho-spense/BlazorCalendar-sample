@@ -1,23 +1,28 @@
-# Welcome to MLSA Blazor Outlook Calendar!
+# Welcome to Blazor Outlook Calendar!
+
+With the power of WebAssembly that lets you run C# code in the browser, Blazor Outlook Calendar comes to show you the results of that power while building Single Page Applications very smoothly and easily with .NET and C# our favorite programming language.
+
+Blazor Outlook Calendar is a Single Page Application built with C# as a demo and a full course on my YouTube Channel 'AK Academy' you can find it here 
+
+[Full Course on AK Academy Channel](https://www.youtube.com/watch?v=5ouXHtzKL5o&list=PLFJQnCcZXWjv89uDubYW7NniK8mEl4sWQ)
+
 It's a Calendar and events application that is synced and integrated with Microsoft Outlook Calendar using Microsoft Graph API.
-## Bio
-👋 Hey! I'm Kevin Comba Gatimu , [a beta MLSA](https://studentambassadors.microsoft.com/en-US/studentambassadors/profile/b81411c3-fbca-4a78-86c3-e7360f946b7f).
-## [🔗Previous Deployed Link](https://blazorhosting.z13.web.core.windows.net/)
-## Objectives
-- View all events on your calendar
-- Add events to my calendar
-- View a summary of events per day
+It's teaches you how to render and create a Calendar component from scratch and more
 
-## ScreenShots
-- LoginPage
+![The Main App UI for authenticated users](https://github.com/aksoftware98/BlazorOutlookCalendar/blob/master/images/1.png?raw=true)
 
-![0](https://user-images.githubusercontent.com/57180726/222939196-9cf02eb5-1c05-406e-b335-eb705db58d28.PNG)
+![App UI for not authenticated users](https://github.com/aksoftware98/BlazorOutlookCalendar/blob/master/images/2.png?raw=true)
 
-- HomePage
+# What you will learn
 
-![1](https://user-images.githubusercontent.com/57180726/222939205-d6365220-fbe8-4aa7-9a40-3dc383328bc4.PNG)
-
-![2](https://user-images.githubusercontent.com/57180726/222939220-722b0366-e47e-4c9c-8a2d-d262fc63a7b2.PNG)
+ - Developing Client Side Web Apps with Blazor WebAssembly.
+ - Authenticating users with Microsoft Azure Active Directory.
+ - Fetching and adding data to Microsoft 365 with Microsoft Graph API.
+ - Learn how to design and develop a Calendar control from scratch.
+ - Learn how you manipulate the DOM in Blazor WebAssembly.
+ - Design a full web page from scratch with HTML, CSS, Bootstrap and the Microsoft Design Language (Fluent UI).
+ - Implement communication between Blazor Web App components.
+ - Manage the states of the components within the Blazor WebAssembly app. 
 
 
 ## How to make this app works
@@ -39,4 +44,4 @@ It's a Calendar and events application that is synced and integrated with Micros
  - Go back to your project folder and open the cmd then the run the command dotnet run. 
  And ready to go.
 
-
+### Enjoy the course and hope you get all the benefits within your journey in Blazor WebAssembly 
