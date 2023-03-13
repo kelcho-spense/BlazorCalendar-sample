@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BlazorSample.Models;
+using BlazorCalendar.Blazor.Models;
 
-namespace BlazorSample.Services
+namespace BlazorCalendar.Blazor.Services
 {
-    public interface ICalendarEventsProvider
+    public interface ICalendarEventsProvider 
     {
 
         Task<IEnumerable<CalendarEvent>> GetEventsInMonthAsync(int year, int month);

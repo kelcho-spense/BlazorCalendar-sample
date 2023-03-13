@@ -2,93 +2,108 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.Graph;
-using Newtonsoft.Json;
-using BlazorSample.Models;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using BlazorCalendar.Blazor.Models;
+using System.Text.Json;
 
-namespace BlazorSample.Services
+namespace BlazorCalendar.Blazor.Services
 {
     public class MicrosoftCalendarEventsProvider : ICalendarEventsProvider
     {
-        private readonly IAccessTokenProvider _accessTokenProvider;
-        private readonly GraphServiceClient _graphClient;
 
+        // Get Access token 
+        private readonly IAccessTokenProvider _accessTokenProvider;
+        private readonly HttpClient _httpClient;
+
+        private const string BASE_URL = "https://graph.microsoft.com/v1.0/me/events";
+        private readonly JsonSerializerOptions _serializationOptions;
         public MicrosoftCalendarEventsProvider(IAccessTokenProvider accessTokenProvider, HttpClient httpClient)
         {
             _accessTokenProvider = accessTokenProvider;
-
-            var graphAuthHandler = new MsalAuthenticationProvider(accessTokenProvider);
-            _graphClient = new GraphServiceClient(graphAuthHandler);
+            _httpClient = httpClient;
+            _serializationOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
         }
 
         public async Task<IEnumerable<CalendarEvent>> GetEventsInMonthAsync(int year, int month)
         {
-            var startDateTime = new DateTime(year, month, 1);
-            var endDateTime = startDateTime.AddMonths(1).AddDays(-1);
-
-            try
-            {
-                var events = await _graphClient.Me.CalendarView
-                    .Request(new List<QueryOption>()
-                    {
-                        new QueryOption("startdatetime", startDateTime.ToString("o")),
-                        new QueryOption("enddatetime", endDateTime.ToString("o"))
-                    })
-                    .Select(e => new
-                    {
-                        e.Subject,
-                        e.Start,
-                        e.End
-                    })
-                    .GetAsync();
-
-                var calendarEvents = new List<CalendarEvent>();
-
-                foreach (var ev in events.CurrentPage)
-                {
-                    calendarEvents.Add(new CalendarEvent
-                    {
-                        Subject = ev.Subject,
-                        StartDate = ev.Start.DateTime,
-                        EndDate = ev.End.DateTime
-                    });
-                }
-
-                return calendarEvents;
-            }
-            catch (ServiceException ex)
-            {
-                Console.WriteLine($"Error getting events: {ex.Message}");
+            // 1- Get Token 
+            var accessToken = await GetAccessTokenAsync();
+            if(accessToken == null)
                 return null;
+
+            // 2- Set the access token in the authorization header 
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+
+            // 3-  Send the request 
+            var response = await _httpClient.GetAsync(ConstructGraphUrl(year, month));
+
+            if(!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine(await response.Content.ReadAsStringAsync());
             }
+
+            // 4- Read the content 
+            var contentAsString = await response.Content.ReadAsStringAsync(); 
+
+            var microsoftEvents = JsonSerializer.Deserialize<GraphEventsResponse>(contentAsString, _serializationOptions);
+
+            // Convert the Microsoft Event object into CalendarEvent object
+            var events = new List<CalendarEvent>();
+            foreach (var item in microsoftEvents.Value)
+            {
+                events.Add(new CalendarEvent
+                {
+                    Subject = item.Subject,
+                    StartDate = item.Start.ConvertToLocalDateTime(),
+                    EndDate = item.End.ConvertToLocalDateTime()
+                });
+            }
+
+            return events;
         }
 
         public async Task AddEventAsync(CalendarEvent calendarEvent)
         {
-            var newEvent = new Event
+             // 1- Get Token 
+            var accessToken = await GetAccessTokenAsync();
+            if(accessToken == null)
+            {
+                Console.WriteLine("Access Token is not available");
+                return;
+            }
+
+            // 2- Set the access token in the authorization header 
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("bearer", accessToken);
+
+            // 3- Initialize the content of the post request 
+            string eventAsJson = JsonSerializer.Serialize(new MicrosoftGraphEvent
             {
                 Subject = calendarEvent.Subject,
-                Start = new DateTimeTimeZone
+                Start = new DateTimeTimeZone 
                 {
-                    DateTime = calendarEvent.StartDate.ToString("o"),
+                    DateTime = calendarEvent.StartDate.ToString(),
                     TimeZone = TimeZoneInfo.Local.Id
                 },
-                End = new DateTimeTimeZone
+                End = new DateTimeTimeZone 
                 {
-                    DateTime = calendarEvent.EndDate.ToString("o"),
-                    TimeZone = TimeZoneInfo.Local.Id
+                    DateTime = calendarEvent.EndDate.ToString(),
+                    TimeZone = TimeZoneInfo.Local.Id,
                 }
-            };
+            }, _serializationOptions);
 
-            try
-            {
-                await _graphClient.Me.Events.Request().AddAsync(newEvent);
+            var content = new StringContent(eventAsJson);
+            content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"); 
+
+            // Send the request
+            var response = await _httpClient.PostAsync(BASE_URL, content);
+
+            if(response.IsSuccessStatusCode)
                 Console.WriteLine("Event has been added successfully!");
-            }
-            catch (ServiceException ex)
-            {
-                Console.WriteLine($"Error adding event: {ex.Message}");
-            }
+            else
+                Console.WriteLine(response.StatusCode);
         }
 
         private async Task<string> GetAccessTokenAsync()
@@ -99,15 +114,21 @@ namespace BlazorSample.Services
             });
 
             // Try to fetch the token 
-            if (tokenRequest.TryGetToken(out var token))
+            if(tokenRequest.TryGetToken(out var token))
             {
-                if (token != null)
+                if(token != null)
                 {
                     return token.Value;
                 }
             }
 
-            return null;
+            return null; 
+        }
+
+        private string ConstructGraphUrl(int year, int month)
+        {
+            var daysInMonth = DateTime.DaysInMonth(year, month);
+            return $"{BASE_URL}?$filter=start/dateTime ge '{year}-{month}-01T00:00' and end/dateTime le '{year}-{month}-{daysInMonth}T00:00'&$select=subject,start,end";
         }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BlazorSample.Models
+namespace BlazorCalendar.Blazor.Models
 {
     public class CalendarDay
     {
@@ -9,6 +9,6 @@ namespace BlazorSample.Models
         public DateTime Date { get; set; }
         public bool IsEmpty { get; set; }
 
-        public List<CalendarEvent>? Events { get; set; }
+        public List<CalendarEvent> Events { get; set; }
     }
 }

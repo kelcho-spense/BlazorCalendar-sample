@@ -1,56 +1,18 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.UI;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Graph = Microsoft.Graph;
-using BlazorSample.Data;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using BlazorCalendar.Blazor;
+using BlazorCalendar.Blazor.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// Add services to the container.
-var initialScopes = builder.Configuration["DownstreamApi:Scopes"]?.Split(' ');
-
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-        .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
-            .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
-            .AddInMemoryTokenCaches();
-builder.Services.AddControllersWithViews()
-    .AddMicrosoftIdentityUI();
-
-builder.Services.AddAuthorization(options =>
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped<ICalendarEventsProvider, MicrosoftCalendarEventsProvider>();
+builder.Services.AddMsalAuthentication(options =>
 {
-    // By default, all incoming requests will be authorized according to the default policy
-    options.FallbackPolicy = options.DefaultPolicy;
+    builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
+	options.ProviderOptions.DefaultAccessTokenScopes = new[] { "https://graph.microsoft.com/Calendars.ReadWrite" };
 });
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor()
-    .AddMicrosoftIdentityConsentHandler();
-builder.Services.AddSingleton<WeatherForecastService>();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.MapControllers();
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
-
-app.Run();
+await builder.Build().RunAsync();

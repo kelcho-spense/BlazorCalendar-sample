@@ -1,17 +1,27 @@
 ﻿@page "/"
 
+<PageTitle>Index</PageTitle>
 
-@* @using Microsoft.Identity.Web
-@using Microsoft.Graph
-@inject Microsoft.Graph.GraphServiceClient GraphServiceClient
-@inject MicrosoftIdentityConsentAndConditionalAccessHandler ConsentHandler *@
+ <!-- Header -->
+<header>
+        <h3 class="ms-fontSize-42 ms-fontWeight-regular">Welcome to Blazor Calendar</h3>
+        <p class="ms-fontSize-14 ms-fontWeight-regular">Blaozr Calendar allows you to manage all you events within your
+            Outlook Calendar</p>
 
-<PageTitle>Blazor Calendar</PageTitle>
+        <!-- NotAuthenticated Users-->
+        <AuthorizeView>
+            <NotAuthorized>
+                   <p class="ms-fontSize-14 ms-fontWeight-regular">Please Sign in with your Micorosft Account to get started</p>
+                    <a href="authentication/login" class="microsoft-login-button shadow-effect"><img src="assets/images/microsoft.png" alt=""> Sign in
+                        with Microsoft</a>
+            </NotAuthorized>
+        </AuthorizeView>
+</header>
 
-    <h3 class="ms-fontSize-42 ms-fontWeight-regular">Welcome to Blazor Calendar</h3>
-    <p class="ms-fontSize-14 ms-fontWeight-regular">Blazor Calendar allows you to manage all you events within your Outlook Calendar</p>
 
-<div class="row">
+<AuthorizeView>
+    <Authorized>
+ <div class="row">
 
         <!-- Calendar -->
         <div class="col-sm-12 col-md-12 col-lg-9">
@@ -24,7 +34,7 @@
                     @if(!day.IsEmpty)
                     {
                         <div class="day shadow-effect @currentDayClass @selectedDayClass" @onclick="() => selectedDay = day">
-                            <h3 class="ms-fontSize-24 ms-fontWeight-regular">@day.DayNumber</h3> 
+                            <h3 class="ms-fontSize-24 ms-fontWeight-regular">@day.DayNumber</h3>
                             @if(day.Events != null && day.Events.Count != 0)
                             {
                                 var firstEvent = day.Events.FirstOrDefault();
@@ -38,35 +48,23 @@
                                          @firstEvent.Subject
                                     }
                                 </div>
-                            }                           
+                            }
                         </div>
                     }
                 </DayTemplate>
             </Calendar>
-        
-        </div>
+       </div>
 
-        <!-- Day Menu -->
+
+         <!-- Day Menu -->
         <div class="col-sm-12 col-md-12 col-lg-3">
-            <!-- Add Event -->
             <AddEvent SelectedDay="@selectedDay" />
+
             <EventsList SelectedDay="@selectedDay" />
         </div>
-    </div>
+ </div>
 
-@code 
-{
-    private CalendarDay selectedDay = new  CalendarDay
-    {
-        Date = DateTime.Now
-    };
-     
-     protected override void OnInitialized()
-    {
-        AddEvent.OnEventAdded += () => 
-        {
-            StateHasChanged();
-        };
-    }
-}
+            </Authorized>
+   </AuthorizeView>
 
+									
